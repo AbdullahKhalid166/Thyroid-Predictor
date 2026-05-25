@@ -46,55 +46,63 @@ referral_source = st.text_input("Referral Source", "SVI")
 
 if st.button("Predict"):
 
-    new_patient = pd.DataFrame([{
-        'age': age,
-        'sex': sex,
-        'on_thyroxine': on_thyroxine,
-        'query_on_thyroxine': query_on_thyroxine,
-        'on_antithyroid_meds': on_antithyroid_meds,
-        'sick': sick,
-        'pregnant': pregnant,
-        'thyroid_surgery': thyroid_surgery,
-        'I131_treatment': I131_treatment,
-        'query_hypothyroid': query_hypothyroid,
-        'query_hyperthyroid': query_hyperthyroid,
-        'lithium': lithium,
-        'goitre': goitre,
-        'tumor': tumor,
-        'hypopituitary': hypopituitary,
-        'psych': psych,
-        'TSH_measured': 1,
-        'TSH': TSH,
-        'T3_measured': 1,
-        'T3': T3,
-        'TT4_measured': 1,
-        'TT4': TT4,
-        'T4U_measured': 1,
-        'T4U': T4U,
-        'FTI_measured': 1,
-        'FTI': FTI,
-        'TBG_measured': 0,
-        'TBG': np.nan,
-        'referral_source': referral_source
-    }])
+    try:
+        # Basic validation
+        if age <= 0 or age > 120:
+            st.error("Please fill input correctly. Age must be between 1 and 120.")
+            st.stop()
 
-    # ✅ Predictions
-    rf_pred = rf_model.predict(new_patient)[0]
-    rf_prob = rf_model.predict_proba(new_patient)[0][1]
+        if referral_source.strip() == "":
+            st.error("Please fill input correctly. Referral source cannot be empty.")
+            st.stop()
 
-    xgb_pred = xgb_model.predict(new_patient)[0]
-    xgb_prob = xgb_model.predict_proba(new_patient)[0][1]
+        new_patient = pd.DataFrame([{
+            'age': age,
+            'sex': sex,
+            'on_thyroxine': on_thyroxine,
+            'query_on_thyroxine': query_on_thyroxine,
+            'on_antithyroid_meds': on_antithyroid_meds,
+            'sick': sick,
+            'pregnant': pregnant,
+            'thyroid_surgery': thyroid_surgery,
+            'I131_treatment': I131_treatment,
+            'query_hypothyroid': query_hypothyroid,
+            'query_hyperthyroid': query_hyperthyroid,
+            'lithium': lithium,
+            'goitre': goitre,
+            'tumor': tumor,
+            'hypopituitary': hypopituitary,
+            'psych': psych,
+            'TSH_measured': 1,
+            'TSH': TSH,
+            'T3_measured': 1,
+            'T3': T3,
+            'TT4_measured': 1,
+            'TT4': TT4,
+            'T4U_measured': 1,
+            'T4U': T4U,
+            'FTI_measured': 1,
+            'FTI': FTI,
+            'TBG_measured': 0,
+            'TBG': np.nan,
+            'referral_source': referral_source.strip().upper()
+        }])
 
-    # ======================
-    # OUTPUT
-    # ======================
+        rf_pred = rf_model.predict(new_patient)[0]
+        rf_prob = rf_model.predict_proba(new_patient)[0][1]
 
-    st.subheader("Results")
+        xgb_pred = xgb_model.predict(new_patient)[0]
+        xgb_prob = xgb_model.predict_proba(new_patient)[0][1]
 
-    st.write("### Random Forest")
-    st.write("Prediction:", "Disease" if rf_pred == 1 else "Normal")
-    st.write(f"Probability: {rf_prob*100:.2f}%")
+        st.subheader("Results")
 
-    st.write("### XGBoost")
-    st.write("Prediction:", "Disease" if xgb_pred == 1 else "Normal")
-    st.write(f"Probability: {xgb_prob*100:.2f}%")
+        st.write("### Random Forest")
+        st.write("Prediction:", "Disease" if rf_pred == 1 else "Normal")
+        st.write(f"Probability: {rf_prob * 100:.2f}%")
+
+        st.write("### XGBoost")
+        st.write("Prediction:", "Disease" if xgb_pred == 1 else "Normal")
+        st.write(f"Probability: {xgb_prob * 100:.2f}%")
+
+    except Exception:
+        st.error("Please fill input correctly.")
