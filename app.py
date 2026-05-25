@@ -4,8 +4,8 @@ import numpy as np
 import joblib
 
 # ✅ Load models
-rf_model = joblib.load("thyroid_model.pkl")
-xgb_model = joblib.load("xgb_model.pkl")
+rf_model = joblib.load("models/thyroid_model.pkl")
+xgb_model = joblib.load("models/xgb_model.pkl")
 
 st.title("Thyroid Disease Predictor")
 
